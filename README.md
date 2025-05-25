@@ -1,4 +1,4 @@
-# ExamPro - Mock Test Generator
+# Mock Master - Mock Test Generator
 
 A modern mock test platform built with React and Tailwind CSS, featuring secure authentication and JSON-powered test creation.
 
