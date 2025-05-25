@@ -5,7 +5,7 @@ const Header = ({ isAuthenticated, onLogout }) => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="h-12 w-12 rounded-full bg-gradient-to-r from-purple-600 to-blue-500 flex items-center justify-center text-white font-medium">
+            <div className="h-12 w-12 rounded-full bg-gradient-to-r cursor-pointer from-purple-600 to-blue-500 flex items-center justify-center text-white font-medium">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -21,7 +21,7 @@ const Header = ({ isAuthenticated, onLogout }) => {
                 />
               </svg>
             </div>
-            <span className="ml-2 text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500 ">Mock-Master</span>
+            <span className="ml-2 text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500 cursor-pointer ">MockSprint</span>
           </div>
 
           {/* Navigation */}
@@ -34,7 +34,7 @@ const Header = ({ isAuthenticated, onLogout }) => {
                 Logout
               </button>
             ) : (
-              <span className="text-gray-400 px-3 py-2 text-sm font-medium">
+              <span className="text-gray-400 px-3 py-2 text-sm font-medium cursor-pointer">
                 Please login
               </span>
             )}
@@ -46,3 +46,4 @@ const Header = ({ isAuthenticated, onLogout }) => {
 };
 
 export default Header;
+
