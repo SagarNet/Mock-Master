@@ -1,4 +1,4 @@
-# Mock Master - Mock Test Generator
+# Mock Sprint - Mock Test Generator
 
 A modern mock test platform built with React and Tailwind CSS, featuring secure authentication and JSON-powered test creation.
 
@@ -11,7 +11,7 @@ A modern mock test platform built with React and Tailwind CSS, featuring secure 
 
 ## Installation
 ```bash
-git clone https://github.com/SagarNet/Mock-Master.git
+git clone https://github.com/SagarNet/Mock-Sprint.git
 cd mock-test-app
 npm install
 npm run dev
