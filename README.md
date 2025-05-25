@@ -11,7 +11,7 @@ A modern mock test platform built with React and Tailwind CSS, featuring secure 
 
 ## Installation
 ```bash
-git clone https://github.com/yourusername/exampro.git
+git clone https://github.com/SagarNet/Mock-Master.git
 cd mock-test-app
 npm install
 npm run dev
