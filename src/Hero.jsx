@@ -22,7 +22,7 @@ export default function App() {
   const toggleSteps = () => {
     setShowSteps(!showSteps);
   };
-  
+
   // Update progress whenever current question changes
   useEffect(() => {
     if (questions.length > 0) {
@@ -32,11 +32,21 @@ export default function App() {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-    // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     try {
       const parsedQuestions = JSON.parse(data.questionsInput);
+      
+      // Validate questions before setting state
+      parsedQuestions.forEach(q => {
+        if (!q.id || !q.question || !q.options || !q.correctAnswer) {
+          throw new Error("Missing required fields in question");
+        }
+        if (!q.options.includes(q.correctAnswer)) {
+          throw new Error(`Correct answer not found in options for question ${q.id}`);
+        }
+      });
+
       if (Array.isArray(parsedQuestions)) {
         setQuestions(parsedQuestions);
         setTestStarted(true);
@@ -48,17 +58,17 @@ export default function App() {
         alert("Please enter a valid array of questions");
       }
     } catch (error) {
-      alert("Invalid JSON format. Please check your input.");
+      alert(`Invalid question format: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleOptionSelect = (questionId, selectedOption) => {
-    setAnswers({
-      ...answers,
+    setAnswers(prev => ({
+      ...prev,
       [questionId]: selectedOption,
-    });
+    }));
   };
 
   const goToNextQuestion = () => {
@@ -85,16 +95,19 @@ export default function App() {
   const calculateResults = () => {
     let correct = 0;
     let incorrect = 0;
+    let unanswered = 0;
 
     questions.forEach((question) => {
-      if (answers[question.id] === question.correctAnswer) {
+      if (answers[question.id] === undefined) {
+        unanswered++;
+      } else if (answers[question.id] === question.correctAnswer) {
         correct++;
-      } else if (answers[question.id] !== undefined) {
+      } else {
         incorrect++;
       }
     });
 
-    return { correct, incorrect };
+    return { correct, incorrect, unanswered };
   };
 
   if (!testStarted) {
@@ -109,14 +122,14 @@ export default function App() {
           >
             <div className="bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700">
               <div className="p-8 sm:p-10">
-                <div className="flex items-center justify-between mb-8  flex-col sm:flex-row">
+                <div className="flex items-center justify-between mb-8 flex-col sm:flex-row">
                   <motion.h1
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
                     className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500"
                   >
-                    Mock Master
+                    MockSprint
                   </motion.h1>
                   <div className="text-sm text-gray-400">
                     Premium Mock Test Platform
@@ -134,7 +147,7 @@ export default function App() {
                         htmlFor="questions"
                         className="block text-sm font-medium text-gray-300 mb-3"
                       >
-                        Enter Questions (JSON format)
+                        Enter Questions (JSON format) :
                       </label>
                       <textarea
                         id="questions"
@@ -210,31 +223,35 @@ export default function App() {
               </div>
             </div>
 
-<div className="mt-8 text-center text-gray-400 text-sm">
-      <button 
-        onClick={toggleSteps}
-        className="text-blue-400 font-bold hover:text-blue-300  cursor-pointer"
-      >
-        How to generate JSON format?
-      </button>
+            <div className="mt-8 text-center text-gray-400 text-sm">
+              <button
+                onClick={toggleSteps}
+                className="text-blue-400 font-bold hover:text-blue-300 cursor-pointer"
+              >
+                How to generate JSON format?
+              </button>
 
-      {showSteps && (
-        <div className="mt-4 p-4 bg-gray-800 rounded-lg text-left">
-          <ol className="list-decimal pl-5 space-y-2">
-            <li>Open ChatGPT or DeepSeek in your browser</li>
-            <li>Request JSON formatted questions like this:
-              <p className="bg-gray-700 p-2 rounded mt-1 font-mono text-xs">
-                "Create a JSON array of 10 quiz questions about [TOPIC] with: question text, 4 options, and correctAnswer"
-              </p>
-            </li>
-            <li>Copy the generated JSON output</li>
-            <li>Paste it into the above input field</li>
-            <li>After pasting it, Click on start premium test button</li>
-            <li>Enjoy your test, Best of luck for your exams !!</li>
-          </ol>
-        </div>
-      )}
-    </div>
+              {showSteps && (
+                <div className="mt-4 p-4 bg-gray-800 rounded-lg text-left">
+                  <ol className="list-decimal pl-5 space-y-2">
+                    <li>Open ChatGPT or DeepSeek in your browser</li>
+                    <li>
+                      Request JSON formatted questions like this:
+                      <p className="bg-gray-700 p-2 rounded mt-1 font-mono text-xs">
+                        "Create a JSON array of 10 quiz questions about [TOPIC]
+                        with: question text, 4 options, and correctAnswer"
+                      </p>
+                    </li>
+                    <li>Copy the generated JSON output</li>
+                    <li>Paste it into the above input field</li>
+                    <li>
+                      After pasting it, Click on start premium test button
+                    </li>
+                    <li>Enjoy your test, Best of luck for your exams !!</li>
+                  </ol>
+                </div>
+              )}
+            </div>
           </motion.div>
         </AnimatePresence>
       </div>
@@ -242,9 +259,10 @@ export default function App() {
   }
 
   if (showResults) {
-    const { correct, incorrect } = calculateResults();
-    const unanswered = questions.length - correct - incorrect;
-    const score = Math.round((correct / questions.length) * 100);
+    const { correct, incorrect, unanswered } = calculateResults();
+    const score = questions.length > 0 
+      ? Math.round((correct / questions.length) * 100)
+      : 0;
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
@@ -260,14 +278,14 @@ export default function App() {
                 <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
                   Your Results
                 </h1>
-                <div className="text-sm text-gray-400">Test Completed</div>
+                <div className="text-sm text-gray-400">You Scored {score}%</div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                 <motion.div
                   initial={{ scale: 0.9 }}
                   animate={{ scale: 1 }}
-                  className="bg-gray-700 p-6 rounded-xl border border-gray-600"
+                  className="bg-gray-700 p-6 rounded-xl border border-green-500/30"
                 >
                   <div className="text-5xl font-bold text-green-400 mb-2">
                     {correct}
@@ -279,7 +297,7 @@ export default function App() {
                   initial={{ scale: 0.9 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.1 }}
-                  className="bg-gray-700 p-6 rounded-xl border border-gray-600"
+                  className="bg-gray-700 p-6 rounded-xl border border-red-500/30"
                 >
                   <div className="text-5xl font-bold text-red-400 mb-2">
                     {incorrect}
@@ -291,25 +309,28 @@ export default function App() {
                   initial={{ scale: 0.9 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="bg-gray-700 p-6 rounded-xl border border-gray-600"
+                  className="bg-gray-700 p-6 rounded-xl border border-yellow-500/30"
                 >
                   <div className="text-5xl font-bold text-yellow-400 mb-2">
-                    {score}%
+                    {unanswered}
                   </div>
-                  <div className="text-gray-300">Overall Score</div>
+                  <div className="text-gray-300">Unanswered Questions</div>
                 </motion.div>
+                
               </div>
 
               <div className="mb-8">
                 <div className="w-full bg-gray-700 rounded-full h-3">
                   <div
                     className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full"
-                    style={{ width: `${score}%` }}
+                    style={{ width: `${score}%` }} 
                   ></div>
                 </div>
                 <div className="flex justify-between text-sm text-gray-400 mt-2">
                   <span>0%</span>
+                  <span>25%</span>
                   <span>50%</span>
+                  <span>75%</span>
                   <span>100%</span>
                 </div>
               </div>
@@ -325,7 +346,7 @@ export default function App() {
                         ? "border-green-500/30 bg-green-500/10"
                         : answers[q.id]
                         ? "border-red-500/30 bg-red-500/10"
-                        : "border-gray-600 bg-gray-700"
+                        : "border-yellow-500/30 bg-yellow-500/10"
                     }`}
                   >
                     <h3 className="font-medium text-gray-200">{q.question}</h3>
@@ -333,7 +354,9 @@ export default function App() {
                       className={`mt-3 text-sm ${
                         answers[q.id] === q.correctAnswer
                           ? "text-green-400"
-                          : "text-red-400"
+                          : answers[q.id]
+                          ? "text-red-400"
+                          : "text-yellow-400"
                       }`}
                     >
                       Your answer: {answers[q.id] || "Not answered"}
@@ -370,7 +393,6 @@ export default function App() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700"
         >
-          {/* Progress bar */}
           <div className="h-1.5 bg-gray-700">
             <div
               className="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-500 ease-out"
@@ -387,13 +409,14 @@ export default function App() {
                 </p>
               </div>
               <div className="text-sm px-3 py-1 bg-gray-700 rounded-full text-gray-300">
-                Score:{" "}
-                {Math.round(
-                  (questions.filter((q) => answers[q.id] === q.correctAnswer)
-                    .length /
-                    questions.length) *
-                    100
-                )}
+                Current Score:{" "}
+                {questions.length > 0
+                  ? Math.round(
+                      (questions.filter((q) => answers[q.id] === q.correctAnswer).length /
+                        questions.length) *
+                        100
+                    )
+                  : 0}
                 %
               </div>
             </div>
