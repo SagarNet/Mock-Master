@@ -1,12 +1,46 @@
-# React + Vite
+# ExamPro - Mock Test Generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern mock test platform built with React and Tailwind CSS, featuring secure authentication and JSON-powered test creation.
 
-Currently, two official plugins are available:
+## Features
+- Admin Authentication (Username: `sagaradmin`, Password: `adminsagar`)
+- JSON Test Creation - Easily generate tests via AI prompts
+- Interactive Testing Interface
+- Instant Results with detailed scoring
+- Responsive Dark/Light Mode
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Installation
+```bash
+git clone https://github.com/yourusername/exampro.git
+cd mock-test-app
+npm install
+npm run dev
+```
+## How to Generate Test Data
 
-## Expanding the ESLint configuration
+- Use ChatGPT/DeepSeek with this prompt:
+"Create a JSON array of 10 quiz questions about [TOPIC] with: id, question, 4 options, correctAnswer, and explanation fields."
+- Save the output in the input field
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+#### Example Question Format
+```json
+{
+  "id": 1,
+  "question": "Sample question?",
+  "options": ["A", "B", "C", "D"],
+  "correctAnswer": "B",
+  "explanation": "Explanation text"
+}
+```
+## Technologies Used
+- Vite
+- React
+- Talwind CSS
+- React Hook Form
+- Framer Motion
+
+  ## Available Scripts
+- ```npm run dev``` - Start development server
+- ```run build``` - Create production build
+- ```npm run preview``` - Locally preview production build
